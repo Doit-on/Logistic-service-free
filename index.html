@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./default_logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="application-version" content="2.0.0" />
+    <meta name="build-date" content="2026-10-10" />
+    <title>Smart Logistics & Field Service Platform (Premium Edition)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Web Client OCR Engine (Tesseract.js for Offline/Online Thai-English Recognition) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" async defer onerror="console.warn('Tesseract OCR CDN unreachable; running in offline mode')"></script>
+    <script>
+      // 0. Auto-redirect to compiled standalone single-file if opened directly via file:// in dev root
+      if (window.location.protocol === 'file:' && window.location.pathname.endsWith('index.html') && !window.location.pathname.includes('/dist/')) {
+        window.location.replace('./smart-logistics-single-file.html');
+      }
+
+      // 1. ป้องกันปัญหาเปิดบน GitHub Pages โดยไม่มีเครื่องหมาย slash ท้าย URL
+      if (!location.pathname.endsWith('/') && !location.pathname.split('/').pop().includes('.')) {
+        location.replace(location.pathname + '/' + location.search + location.hash);
+      }
+
+      // 2. ป้องกันเครื่องพนักงานและเบราว์เซอร์ค้างแคชเวอร์ชันเก่า
+      var CURRENT_APP_VERSION = 'v2.0.0';
+      var previousVersion = localStorage.getItem('smart_logistic_app_version');
+      if (previousVersion && previousVersion !== CURRENT_APP_VERSION) {
+        localStorage.setItem('smart_logistic_app_version', CURRENT_APP_VERSION);
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            names.forEach(function(name) { caches.delete(name); });
+          });
+        }
+      } else {
+        localStorage.setItem('smart_logistic_app_version', CURRENT_APP_VERSION);
+      }
+
+      // Background Version Watchdog: ตรวจจับเวอร์ชันจากเซิร์ฟเวอร์แบบ Real-time ทันที (เฉพาะเมื่อเปิดผ่าน Web Server)
+      (function() {
+        if (window.fetch && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+          fetch('./VERSION.txt?t=' + Date.now(), { cache: 'no-store' })
+            .then(function(res) { return res.ok ? res.text() : ''; })
+            .then(function(txt) {
+              var m = txt.match(/Version:\s*(v[0-9]+\.[0-9]+\.[0-9]+)/i);
+              if (m && m[1] && m[1].toLowerCase() !== CURRENT_APP_VERSION.toLowerCase()) {
+                console.warn('[VersionWatchdog] New version detected:', m[1], 'Current:', CURRENT_APP_VERSION);
+                if ('caches' in window) {
+                  caches.keys().then(function(names) {
+                    names.forEach(function(n) { caches.delete(n); });
+                  });
+                }
+                var cleanVer = m[1].replace('v', '');
+                var currentSearch = new URLSearchParams(window.location.search);
+                if (currentSearch.get('v') !== cleanVer) {
+                  currentSearch.set('v', cleanVer);
+                  currentSearch.set('_t', Date.now());
+                  window.location.replace(window.location.pathname + '?' + currentSearch.toString() + window.location.hash);
+                }
+              }
+            })
+            .catch(function() {});
+        }
+      })();
+
+      // 3. ฟังก์ชันแสดงข้อผิดพลาดบนหน้าจอแบบสมบูรณ์ ป้องกันปัญหาจอขาวหรือค้าง
+      function showAppError(msg) {
+        var root = document.getElementById('root');
+        if (root && root.querySelector('#app-loading-screen')) {
+          root.innerHTML = '<div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f172a; padding: 20px; font-family: sans-serif; text-align: center;"><div style="max-width: 440px; width: 100%; background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);"><div style="font-size: 40px; margin-bottom: 8px;">⚠️</div><h3 style="margin: 0 0 8px 0; font-size: 17px; font-weight: bold; color: #0f172a;">พบข้อผิดพลาดในการรันระบบ</h3><p style="font-size: 12px; margin: 8px 0 16px 0; color: #be123c; line-height: 1.5; font-family: monospace; background: #fff1f2; padding: 10px 14px; border-radius: 12px; word-break: break-word;">' + (msg || 'Script loading or initialization error') + '</p><div style="display: flex; gap: 8px; justify-content: center;"><button onclick="location.reload(true)" style="padding: 10px 18px; background: #2563eb; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 13px;">รีเฟรชหน้าเว็บ</button><button onclick="localStorage.clear(); location.reload(true);" style="padding: 10px 18px; background: #e2e8f0; color: #334155; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 13px;">ล้างแคชระบบ</button></div></div></div>';
+        }
+      }
+
+      window.addEventListener('error', function(e) {
+        // Ignore external element resource errors (e.g. CDN scripts, images, fonts)
+        if (e.target && e.target.nodeType === 1) {
+          console.warn('Resource load warning (non-fatal):', e.target.src || e.target.href);
+          return;
+        }
+        var msg = e.message || 'Script initialization error';
+        showAppError(msg);
+      }, true);
+
+      window.addEventListener('unhandledrejection', function(e) {
+        console.warn('Unhandled rejection:', e.reason);
+      });
+    </script>
+  </head>
+  <body class="bg-slate-50 text-slate-800 font-['Prompt',sans-serif] antialiased selection:bg-blue-600 selection:text-white">
+    <div id="root">
+      <!-- Loading indicator while React initializes -->
+      <div id="app-loading-screen" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f172a; color: white; font-family: sans-serif; padding: 20px; text-align: center;">
+        <div style="width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.15); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <p style="margin-top: 18px; font-size: 15px; font-weight: bold; letter-spacing: 0.3px;">ระบบบริหารงานขนส่งและบริการภาคสนามอัจฉริยะ (Enterprise Edition)</p>
+        <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 9999px;">
+          <span style="font-size: 11px; font-weight: bold; color: #38bdf8; font-family: monospace;">v2.0.0</span>
+        </div>
+        <p id="loading-subtext" style="margin-top: 10px; font-size: 12px; color: #94a3b8;">กำลังเตรียมความพร้อมระบบ...</p>
+        
+        <!-- Interactive Cache Relief Helper if loading takes > 3.5s -->
+        <div id="cache-relief-box" style="display: none; margin-top: 24px; padding: 14px 18px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; max-width: 340px;">
+          <p style="font-size: 12px; color: #cbd5e1; margin: 0 0 10px 0;">หากหน้านี้ค้างเกิน 5 วินาที แสดงว่าเบราว์เซอร์ติดแคชรุ่นเก่า</p>
+          <div style="display: flex; gap: 8px; justify-content: center;">
+            <button onclick="location.reload(true)" style="padding: 8px 14px; background: #38bdf8; color: #0f172a; border: none; border-radius: 10px; font-weight: bold; font-size: 12px; cursor: pointer;">รีเฟรชหน้าเว็บ</button>
+            <button onclick="localStorage.clear(); location.reload(true);" style="padding: 8px 14px; background: rgba(255,255,255,0.2); color: #ffffff; border: none; border-radius: 10px; font-weight: bold; font-size: 12px; cursor: pointer;">ล้างแคชระบบ</button>
+          </div>
+        </div>
+        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+      </div>
+    </div>
+    <script>
+      setTimeout(function() {
+        var reliefBox = document.getElementById('cache-relief-box');
+        if (reliefBox) {
+          reliefBox.style.display = 'block';
+        }
+      }, 3500);
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
