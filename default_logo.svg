@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Background Hex/Rounded Shield -->
+  <rect x="15" y="15" width="170" height="170" rx="36" fill="url(#primaryGrad)" filter="url(#shadow)" />
+  
+  <!-- Subtle Grid/Speed Lines -->
+  <path d="M25 65 L85 65 M25 85 L65 85 M25 105 L75 105" stroke="#ffffff" stroke-opacity="0.25" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Logistics Truck & Service Wrench Modern Fusion -->
+  <g transform="translate(42, 50)" fill="#ffffff">
+    <!-- Modern Delivery Van Silhouette -->
+    <path d="M12 25 C12 18.37 17.37 13 24 13 L68 13 C74.63 13 80 18.37 80 25 L80 62 L12 62 Z" fill="#ffffff" />
+    <!-- Cab -->
+    <path d="M80 32 L98 32 C102.4 32 106.3 35.2 107.1 39.5 L111 60 C111.5 62.5 109.5 65 107 65 L80 65 Z" fill="#e0f2fe" />
+    <!-- Cab Window -->
+    <path d="M82 36 L96 36 L103 52 L82 52 Z" fill="#0284c7" />
+    <!-- Wheels -->
+    <circle cx="34" cy="65" r="14" fill="#0f172a" />
+    <circle cx="34" cy="65" r="6" fill="#94a3b8" />
+    <circle cx="92" cy="65" r="14" fill="#0f172a" />
+    <circle cx="92" cy="65" r="6" fill="#94a3b8" />
+
+    <!-- Pulse / Speed Glow -->
+    <path d="M30 36 L52 36 M26 44 L44 44" stroke="url(#accentGrad)" stroke-width="4.5" stroke-linecap="round" />
+  </g>
+</svg>
